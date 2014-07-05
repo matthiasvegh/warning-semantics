@@ -22,46 +22,17 @@ ContextStack contextStack;
 	contextStack.contexts.emplace_back(); \
 	getcontext(&(contextStack.contexts.back())); \
 	++contextStack.contextIndex; \
+	struct _SG__LINE__{ ~_SG__LINE__() { std::cout<<"unwinding stack."<<std::endl;contextStack.contexts.pop_back(); --contextStack.contextIndex; }} _sG__LINE__; \
 
 #define goUp() \
 	std::cout << "registered contexts: " << contextStack.contexts.size() << \
 			" current index: " << contextStack.contextIndex << std::endl; \
-	swapcontext(&contextStack.contexts[contextStack.contextIndex], \
-			&contextStack.contexts[--contextStack.contextIndex]); \
+	--contextStack.contextIndex; \
+	swapcontext(&contextStack.contexts[contextStack.contextIndex+1], \
+			&contextStack.contexts[contextStack.contextIndex]); \
 
 #define goDown() \
 	std::cout<<"Entering stack frame "<<contextStack.contextIndex+1<<std::endl; \
 	setcontext(&contextStack.contexts[contextStack.contextIndex+1]); \
 
-volatile bool* bored = new bool(false);
-volatile int* warn = new int;
 
-void child() {
-	logger localVal;
-	std::cout<<"Entered child"<<std::endl;
-	*bored = true;
-	registerContext();
-	std::cout<<"warn is: "<<*warn << std::endl;
-	if(!(*warn)++) {
-		std::cout<<"warn is: "<<*warn << std::endl;
-		goUp();
-	}
-}
-
-void parent() {
-	logger localVal;
-	registerContext();
-	if(!*bored)
-		child();
-	if(!*bored){
-		std::cout<<"going back in"<<std::endl;
-		goDown();
-	}
-}
-
-
-int main() {
-	(*warn) = 0;
-	parent();
-
-}

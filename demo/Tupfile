@@ -1,0 +1,15 @@
+
+include_rules
+
+CXX_FLAGS += -Wno-unused-variable
+ifeq ($(CXX),g++)
+	CXX_FLAGS += -Wno-unused-but-set-variable
+endif
+
+ifeq ($(CXX),g++-4.8)
+	CXX_FLAGS += -Wno-unused-but-set-variable
+endif
+
+: foreach *.cpp |> !cxx |>
+: *.o |> !ld |> demo
+

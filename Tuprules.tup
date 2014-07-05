@@ -1,0 +1,25 @@
+
+.gitignore
+
+ROOT_DIR = $(TUP_CWD)
+DEMO_DIR = $(ROOT_DIR)/demo
+#UT_DIR = $(ROOT_DIR)/ut
+INCLUDE_DIR = $(ROOT_DIR)/include
+
+CXX = @(CXX)
+LD = $(CXX)
+
+CXX_FLAGS += -O3
+CXX_FLAGS += --std=c++1y
+CXX_FLAGS += -Wall
+CXX_FLAGS += -Wextra
+CXX_FLAGS += -Werror
+
+LD_FLAGS += 
+
+INCLUDE_DIRS += -I$(INCLUDE_DIR)
+
+!cxx = |> ^ $(CXX) BUILD: %o^ $(CXX) $(CXX_FLAGS) $(INCLUDE_DIRS) -c %f -o %o |> %B.o
+!ld = |> ^ $(LD) LINK: %o^ $(LD) $(LD_FLAGS) %f -o %o $(LIBS) |>
+!ut = |> ^ $(CXX) UT^ ./%f && touch %o |>
+
